@@ -76,8 +76,6 @@ public class ServiceController {
             return new ResponseEntity<>(new ServiceRequestResource(serviceUtils.getServiceById(id)), HttpStatus.OK);
 
         }
-
-        //throw bad request exception
         throw new BadServiceRequestStatusUpdateException();
     }
 
