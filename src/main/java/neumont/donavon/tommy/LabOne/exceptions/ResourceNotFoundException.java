@@ -2,14 +2,20 @@ package neumont.donavon.tommy.LabOne.exceptions;
 
 public class ResourceNotFoundException extends RuntimeException {
 
-    private final long id;
+    private long id;
 
-    public ResourceNotFoundException(long id)
-    {
+    private String stringID;
+
+    public ResourceNotFoundException(long id) {
         this.id = id;
+    }
+
+    public ResourceNotFoundException() {
+
     }
 
     public long getId() {
         return id;
     }
+
 }
