@@ -11,6 +11,7 @@ public class EmailService {
     private final JavaMailSender emailSender;
 
     EmailService(JavaMailSenderImpl emailSender){
+
         this.emailSender = emailSender;
     }
 

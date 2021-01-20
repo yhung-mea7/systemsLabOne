@@ -24,6 +24,15 @@ public class ServiceController {
         this.serviceUtils = serviceUtils;
     }
 
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @GetMapping(path = "/all")
+    public HttpEntity<CollectionModel<ServiceRequestResource>> getAll()
+    {
+        CollectionModel<ServiceRequestResource> resources = serviceUtils.parseToCollectionModel(serviceUtils.findAll());
+        resources.add(linkTo(methodOn(ServiceController.class).getAll()).withSelfRel());
+        return new ResponseEntity<>(resources, HttpStatus.OK);
+    }
+
     @GetMapping
     @PreAuthorize("hasAuthority('PROVIDER')")
     public HttpEntity<CollectionModel<ServiceRequestResource>> getAllServices() {

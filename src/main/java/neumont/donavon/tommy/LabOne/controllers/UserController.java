@@ -23,6 +23,8 @@ public class UserController {
         this.userServices = userServices;
     }
 
+
+
     @PostMapping
     @ResponseStatus(code= HttpStatus.CREATED)
     public void createUser(@RequestBody User user)
@@ -57,6 +59,7 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
+    @PreAuthorize("hasAuthority('CUSTOMER') or hasAuthority('PROVIDER') or hasAuthority('ADMIN')")
     @PostMapping("/password-reset")
     public HttpEntity<?> resetPassword(@RequestHeader("Authorization") String userId){
         userServices.resetPassword(requestServices.parseUsername(userId));

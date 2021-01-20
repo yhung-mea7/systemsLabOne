@@ -27,6 +27,11 @@ public class ServiceRequestServices {
         this.userRepo = userRepo;
     }
 
+    public List<ServiceRequest> findAll()
+    {
+        return serviceRepo.findAll();
+    }
+
     public void createRequest(final String userId, ServiceRequest request)
     {
         User u = userRepo.findById(userId).orElseThrow(ResourceNotFoundException::new);

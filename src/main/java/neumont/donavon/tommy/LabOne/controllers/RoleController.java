@@ -28,6 +28,7 @@ public class RoleController {
         this.roleServices = roleServices;
     }
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping
     @ResponseStatus(code= HttpStatus.CREATED )
     public void createRole(@RequestBody Role role)

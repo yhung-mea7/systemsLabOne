@@ -1,4 +1,4 @@
 package neumont.donavon.tommy.LabOne.exceptions;
 
-public class UserAlreadyExistException extends RuntimeException{
+public class UserAlreadyExistException extends RuntimeException {
 }
