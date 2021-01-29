@@ -1,0 +1,32 @@
+version: '3'
+
+services:
+  app:
+    container_name: lawncareAPI
+    image: test-img
+    build: .
+#    environment:
+#      - DATABASE_HOST=db
+#      - DATABASE_USER=root
+#      - DATABASE_PASSWORD=password
+#      - DATABASE_NAME=lawncare
+#      - DATABASE_PORT=3306
+    ports:
+      - "8080:8080"
+    restart: always
+
+#  db:
+#    image: mysql:latest
+#    restart: always
+#    container_name: db
+#    environment:
+#      - MYSQL_DATABASE=lawncare
+#      - MYSQL_USER=root
+#      - MYSQL_PASSWORD=password
+#      - MYSQL_ROOT_PASSWORD=password
+#    ports:
+#      - 4000:3306
+#    volumes:
+#      - lawnCareData:/var/lib/mysql
+#volumes:
+#  lawnCareData:
