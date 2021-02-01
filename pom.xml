@@ -17,6 +17,7 @@
 
 	<properties>
 		<java.version>11</java.version>
+		<start-class>neumont.donavon.tommy.LabOne.LabOneApplication</start-class>
 	</properties>
 
 	<dependencies>
