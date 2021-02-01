@@ -1,0 +1,36 @@
+version: '3'
+
+services:
+  app:
+    image: meaty/lawncareapi
+    build: .
+    ports:
+      - 8080
+    restart: always
+    depends_on:
+      - db
+
+  db:
+    image: mysql:latest
+    restart: always
+    container_name: db
+    environment:
+      - MYSQL_DATABASE=lawncare
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=password
+      - MYSQL_ROOT_PASSWORD=password
+    ports:
+      - 4000:3306
+    volumes:
+      - lawncaredata:/var/lib/mysql:rw
+  nginx:
+    image: nginx:latest
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - app
+    ports:
+      - 5000:5000
+
+volumes:
+  lawncaredata:
