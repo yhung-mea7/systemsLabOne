@@ -1,6 +1,8 @@
 package neumont.donavon.tommy.LabOne.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -16,47 +18,50 @@ public class User implements UserDetails {
     private String username;
 
     @Column(nullable = false, unique = true)
+    @Getter @Setter
     private String email;
 
     @Column(nullable = false)
+    @Getter @Setter
     private String password;
 
     @Column(nullable = false)
+    @Getter @Setter
     private String name;
 
     @Column(nullable = false)
+    @Getter @Setter
     private String streetAddress;
 
     @Column(nullable = false)
+    @Getter @Setter
     private String city;
 
     @Column(nullable = false)
+    @Getter @Setter
     private String state;
 
     @Column(nullable = false)
+    @Getter @Setter
     private int zipCode;
 
     @Column(nullable = false, columnDefinition = "INT DEFAULT 1")
+    @Getter @Setter
     private UserType userType;
 
     @Column(nullable = false)
     @ManyToMany
+    @Getter @Setter
     private Set<Role> userRoles = new HashSet<>();
 
 
     @OneToMany(mappedBy = "homeOwner")
+    @Getter @Setter
     private List<ServiceRequest> openRequest = new ArrayList<>();
 
     @OneToMany(mappedBy = "contractor")
+    @Getter @Setter
     private List<ServiceRequest> requestsAccepted = new ArrayList<>();
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
 
     @Override
     @Transient
@@ -69,10 +74,6 @@ public class User implements UserDetails {
                         return s.getName();
                     }
                 }).collect(Collectors.toList());
-    }
-
-    public String getPassword() {
-        return password;
     }
 
     @Override
@@ -108,83 +109,5 @@ public class User implements UserDetails {
         return true;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getStreetAddress() {
-        return streetAddress;
-    }
-
-    public void setStreetAddress(String address) {
-        this.streetAddress = address;
-    }
-
-    public String getCity() {
-        return city;
-    }
-
-    public void setCity(String city) {
-        this.city = city;
-    }
-
-    public int getZipCode() {
-        return zipCode;
-    }
-
-    public void setZipCode(int zipCode) {
-        this.zipCode = zipCode;
-    }
-
-    public UserType getUserType() {
-        return userType;
-    }
-
-    public void setUserType(UserType userType) {
-        this.userType = userType;
-    }
-
-    public Set<Role> getUserRoles() {
-        return userRoles;
-    }
-
-    public void setUserRoles(Set<Role> userRoles) {
-        this.userRoles = userRoles;
-    }
-
-    public List<ServiceRequest> getOpenRequest() {
-        return openRequest;
-    }
-
-    public void setOpenRequest(List<ServiceRequest> openRequest) {
-        this.openRequest = openRequest;
-    }
-
-    public List<ServiceRequest> getRequestsAccepted() {
-        return requestsAccepted;
-    }
-
-    public void setRequestsAccepted(List<ServiceRequest> requestsAccepted) {
-        this.requestsAccepted = requestsAccepted;
-    }
-
-    public String getState() {
-        return state;
-    }
-
-    public void setState(String state) {
-        this.state = state;
-    }
 }
