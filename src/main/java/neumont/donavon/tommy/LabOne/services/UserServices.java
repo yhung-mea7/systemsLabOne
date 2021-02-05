@@ -1,6 +1,5 @@
 package neumont.donavon.tommy.LabOne.services;
 
-import neumont.donavon.tommy.LabOne.components.EmailService;
 import neumont.donavon.tommy.LabOne.exceptions.ResourceNotFoundException;
 import neumont.donavon.tommy.LabOne.exceptions.UserAlreadyExistException;
 import neumont.donavon.tommy.LabOne.models.Role;
@@ -8,6 +7,7 @@ import neumont.donavon.tommy.LabOne.models.User;
 import neumont.donavon.tommy.LabOne.repositories.RoleJPARepository;
 import neumont.donavon.tommy.LabOne.repositories.UserJPARepository;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -18,14 +18,20 @@ public class UserServices {
     private final UserJPARepository userRepo;
     private final RoleJPARepository roleRepo;
     private final PasswordEncoder encoder;
-    private final EmailService email;
+    private final RabbitTemplate amqpTemplate;
 
-     UserServices(UserJPARepository userRepo, RoleJPARepository roleRepo, PasswordEncoder encoder, EmailService email)
+
+
+
+
+     UserServices(UserJPARepository userRepo, RoleJPARepository roleRepo, PasswordEncoder encoder, RabbitTemplate amqpTemplate)
     {
         this.userRepo = userRepo;
         this.roleRepo = roleRepo;
         this.encoder = encoder;
-        this.email = email;
+        this.amqpTemplate = amqpTemplate;
+
+
     }
 
     public void createUser(User user)
@@ -97,7 +103,8 @@ public class UserServices {
         String generatedString = RandomStringUtils.randomAlphabetic(10);
         u.setPassword(encoder.encode(generatedString));
         userRepo.save(u);
-        email.sendSimpleMessage(u.getEmail(), "Temp Password", String.format("Your Temp password is: %s", generatedString));
+        String[] payload = {u.getEmail(), generatedString};
+        amqpTemplate.convertAndSend("emailExchange", "email.new", payload);
 
     }
 
