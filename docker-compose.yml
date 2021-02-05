@@ -4,11 +4,16 @@ services:
   app:
     image: meaty/lawncareapi
     build: .
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/lawncare?allowPublicKeyRetrieval=true&useSSL=false
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=password
     ports:
       - 8080
     restart: always
     depends_on:
       - db
+      - nginx
 
   db:
     image: mysql:latest
@@ -27,10 +32,14 @@ services:
     image: nginx:latest
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
-    depends_on:
-      - app
     ports:
       - 5000:5000
+#  rabbitmq:
+#    image: rabbitmq:3-management
+#    ports:
+#      - 5672:5672
+#      - 15672:15672
+
 
 volumes:
   lawncaredata:
