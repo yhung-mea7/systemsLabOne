@@ -15,20 +15,20 @@ import java.nio.charset.StandardCharsets;
 @Component
 public class EmailEventConsumer {
 
-    private final JavaMailSender emailSender;
-
-    EmailEventConsumer(JavaMailSenderImpl emailSender){
-
-        this.emailSender = emailSender;
-    }
-
-    @RabbitListener(queues = "emailQueue")
-    public void sendSimpleMessage(String[] message){
-        SimpleMailMessage email = new SimpleMailMessage();
-        email.setTo(message[0]);
-        email.setSubject("New Password");
-        email.setText(String.format("New Password: %s", message[1]));
-        emailSender.send(email);
-
-    }
+//    private final JavaMailSender emailSender;
+//
+//    EmailEventConsumer(JavaMailSenderImpl emailSender){
+//
+//        this.emailSender = emailSender;
+//    }
+//
+//    @RabbitListener(queues = "emailQueue")
+//    public void sendSimpleMessage(String[] message){
+//        SimpleMailMessage email = new SimpleMailMessage();
+//        email.setTo(message[0]);
+//        email.setSubject("New Password");
+//        email.setText(String.format("New Password: %s", message[1]));
+//        emailSender.send(email);
+//
+//    }
 }

@@ -8,13 +8,18 @@ import lombok.Setter;
 import org.springframework.hateoas.RepresentationModel;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
-public class ServiceRequest extends RepresentationModel<ServiceRequest> {
+public class ServiceRequest extends RepresentationModel<ServiceRequest> implements Serializable {
+
+    @Transient
+    private static final long serialVersionUID = 1L;
+
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
