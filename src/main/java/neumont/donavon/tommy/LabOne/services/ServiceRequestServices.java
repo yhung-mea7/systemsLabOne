@@ -8,7 +8,6 @@ import neumont.donavon.tommy.LabOne.repositories.ServiceRequestJPARepository;
 import neumont.donavon.tommy.LabOne.repositories.UserJPARepository;
 import neumont.donavon.tommy.LabOne.resources.ServiceRequestResource;
 import org.apache.tomcat.util.codec.binary.Base64;
-import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
