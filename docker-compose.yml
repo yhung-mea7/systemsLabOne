@@ -9,6 +9,7 @@ services:
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=password
       - SPRING_RABBITMQ_HOST=rabbitmq
+      - SPRING_REDIS_HOST=redis-cache
     ports:
       - 8080
     restart: always
@@ -32,6 +33,7 @@ services:
       - lawncaredata:/var/lib/mysql:rw
   nginx:
     image: nginx:latest
+    restart: always
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
     ports:
@@ -42,7 +44,53 @@ services:
     ports:
       - 5672:5672
       - 15672:15672
+  redis-cache:
+    image: redis:alpine
+    volumes:
+      - rediscache:/var/lib/redis:rw
+    ports:
+      - 6379:6379
+  consumer:
+    image: meaty/consumer
+    environment:
+      - SPRING_RABBITMQ_HOST=rabbitmq
+    ports:
+      - 8081
+    restart: always
+    depends_on:
+      - rabbitmq
+      - app
+#  cassandra:
+#    image: cassandra:latest
+#    container_name: lawncarecassandra
+#    ports:
+#      - 9042:9042
+#    volumes:
+#      - cassandradata:/var/lib/cassandra
+#  airflowdb:
+#    image: mysql:5.7
+#    restart: always
+#    container_name: airflowdb
+#    environment:
+#      - MYSQL_DATABASE=airflowdb
+#      - MYSQL_USER=root
+#      - MYSQL_PASSWORD=password
+#      - MYSQL_ROOT_PASSWORD=password
+#    ports:
+#      - 4001:3307
+#    command: ['mysqld', '--explicit_defaults_for_timestamp=1']
+#    volumes:
+#      - airflowdata:/var/lib/mysql:rw
+#  airflow:
+#    image: meaty/airflow
+#    ports:
+#      - 80:8080
+#    depends_on:
+#      - airflowdb
 
 
 volumes:
+  rediscache:
   lawncaredata:
+#  cassandradata:
+#  airflowdata:

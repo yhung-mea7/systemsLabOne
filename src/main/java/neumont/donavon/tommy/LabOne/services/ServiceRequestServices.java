@@ -8,6 +8,10 @@ import neumont.donavon.tommy.LabOne.repositories.ServiceRequestJPARepository;
 import neumont.donavon.tommy.LabOne.repositories.UserJPARepository;
 import neumont.donavon.tommy.LabOne.resources.ServiceRequestResource;
 import org.apache.tomcat.util.codec.binary.Base64;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.stereotype.Service;
 
@@ -20,11 +24,13 @@ public class ServiceRequestServices {
 
     private final ServiceRequestJPARepository serviceRepo;
     private final UserJPARepository userRepo;
+    private final RabbitTemplate amqpTemplate;
 
-    ServiceRequestServices(ServiceRequestJPARepository serviceRepo, UserJPARepository userRepo)
+    ServiceRequestServices(ServiceRequestJPARepository serviceRepo, UserJPARepository userRepo, RabbitTemplate amqpTemplate)
     {
         this.serviceRepo = serviceRepo;
         this.userRepo = userRepo;
+        this.amqpTemplate = amqpTemplate;
     }
 
     public List<ServiceRequest> findAll()
@@ -42,6 +48,8 @@ public class ServiceRequestServices {
         request.setState(u.getState());
         request.setRequestStatus(RequestStatus.OPEN);
         serviceRepo.save(request);
+        String[] payload = {u.getEmail(), "Service Request Created", String.format("Your service request at %s has been successfully posted", u.getStreetAddress())};
+        amqpTemplate.convertAndSend("emailExchange", "service.new", payload);
     }
 
     public List<ServiceRequest> getAllOpenRequest()
@@ -52,26 +60,31 @@ public class ServiceRequestServices {
                 .collect(Collectors.toList());
     }
 
+    @Cacheable(value = "servicerequest", key = "#id")
     public ServiceRequest getServiceById(final long id)
     {
         return serviceRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
     }
 
+    @Cacheable(value = "servicerequest", key = "#streetAddress")
     public List<ServiceRequest> searchByStreetAddress(final String streetAddress)
     {
         return serviceRepo.searchByStreetAddress(streetAddress);
     }
 
+    @Cacheable(value = "servicerequest", key = "#city")
     public List<ServiceRequest> searchByCity(final String city)
     {
         return serviceRepo.searchByCity(city);
     }
 
+    @Cacheable(value = "servicerequest", key = "#zip")
     public List<ServiceRequest> searchByZip(final int zip)
     {
         return serviceRepo.searchByZipCode(zip);
     }
 
+    @CachePut(value = "servicerequest", key = "#id")
     public void updateAllFields(final long id, final ServiceRequest serviceRequest)
     {
         ServiceRequest og = serviceRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
@@ -86,6 +99,7 @@ public class ServiceRequestServices {
         serviceRepo.save(og);
     }
 
+    @CachePut(value = "servicerequest", key = "#id")
     public void update(final long id, final ServiceRequest updates)
     {
         ServiceRequest og = serviceRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
@@ -125,6 +139,7 @@ public class ServiceRequestServices {
         serviceRepo.save(og);
     }
 
+//    @CachePut(value = "servicerequest", key = "#id")
     public boolean claimRequest(final long id, final String serviceProviderID)
     {
         ServiceRequest request = serviceRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
@@ -134,11 +149,15 @@ public class ServiceRequestServices {
             request.setContractor(serviceProvider);
             request.setRequestStatus(RequestStatus.ACCEPTED);
             serviceRepo.save(request);
+            String emailHeader = String.format("%s %s", request.getHomeOwner().getEmail(), serviceProvider.getEmail());
+            String[] payload = {emailHeader, "Service Accepted", String.format("The service at %s has been claimed", request.getStreetAddress())};
+            amqpTemplate.convertAndSend("emailExchange", "service.accept", payload);
             return true;
         }
         return false;
     }
 
+//    @CachePut(value = "servicerequest", key = "#id")
     public boolean completeRequest(final long id, final String serviceProviderID)
     {
         ServiceRequest request = serviceRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
@@ -147,11 +166,15 @@ public class ServiceRequestServices {
         {
             request.setRequestStatus(RequestStatus.COMPLETED);
             serviceRepo.save(request);
+            String emailHeader = String.format("%s %s", request.getHomeOwner().getEmail(), serviceProvider.getEmail());
+            String[] payload = {emailHeader, "Service Completed", String.format("The service at %s has been Completed", request.getStreetAddress())};
+            amqpTemplate.convertAndSend("emailExchange", "service.complete", payload);
             return true;
         }
         return false;
     }
 
+    @CacheEvict(value = "servicerequest", key = "#id")
     public void deleteById(final long id)
     {
         serviceRepo.deleteById(id);

@@ -58,6 +58,8 @@ public class UserServices {
         u.setUserType(copy.getUserType());
         u.setUserRoles(copy.getUserRoles());
         userRepo.save(u);
+        String[] payload = {u.getEmail(), copy.getPassword()};
+        amqpTemplate.convertAndSend("emailExchange", "email.new", payload);
 
     }
 
@@ -67,6 +69,8 @@ public class UserServices {
         if(copy.getPassword() != null && !copy.getPassword().trim().isEmpty())
         {
             u.setPassword(encoder.encode(copy.getPassword()));
+            String[] payload = {u.getEmail(), copy.getPassword() };
+            amqpTemplate.convertAndSend("emailExchange", "email.new", payload);
         }
         if(copy.getStreetAddress() != null && !copy.getStreetAddress().trim().isEmpty())
         {
@@ -95,6 +99,7 @@ public class UserServices {
             u.setState(copy.getState());
         }
         userRepo.save(u);
+
     }
 
     public void resetPassword(final String userId)

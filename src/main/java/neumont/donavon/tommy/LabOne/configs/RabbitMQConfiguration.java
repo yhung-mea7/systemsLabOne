@@ -9,11 +9,18 @@ public class RabbitMQConfiguration {
 
     private static final String QUEUE = "emailQueue";
     private static final String TOPIC = "emailExchange";
+    private static final String serviceQueue = "serviceQueue";
 
     @Bean
     public Queue queue()
     {
-        return new Queue(QUEUE, false);
+        return new Queue(QUEUE, true);
+    }
+
+    @Bean
+    public Queue serviceQueue()
+    {
+        return new Queue(serviceQueue, true);
     }
 
     @Bean
@@ -23,8 +30,15 @@ public class RabbitMQConfiguration {
     }
 
     @Bean
-    public Binding binding(Queue queue, TopicExchange exchange)
+    public Binding binding(TopicExchange exchange)
     {
-        return BindingBuilder.bind(queue).to(exchange).with("email.*");
+        return BindingBuilder.bind(queue()).to(exchange).with("email.*");
     }
+
+    @Bean
+    public Binding serviceBinding(TopicExchange exchange)
+    {
+        return BindingBuilder.bind(serviceQueue()).to(exchange).with("service.*");
+    }
+
 }
