@@ -139,7 +139,7 @@ public class ServiceRequestServices {
         serviceRepo.save(og);
     }
 
-    @CachePut(value = "servicerequest", key = "#id")
+//    @CachePut(value = "servicerequest", key = "#id")
     public boolean claimRequest(final long id, final String serviceProviderID)
     {
         ServiceRequest request = serviceRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
@@ -157,7 +157,7 @@ public class ServiceRequestServices {
         return false;
     }
 
-    @CachePut(value = "servicerequest", key = "#id")
+//    @CachePut(value = "servicerequest", key = "#id")
     public boolean completeRequest(final long id, final String serviceProviderID)
     {
         ServiceRequest request = serviceRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));

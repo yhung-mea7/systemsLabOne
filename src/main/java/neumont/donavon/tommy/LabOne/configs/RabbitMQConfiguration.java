@@ -10,7 +10,6 @@ public class RabbitMQConfiguration {
     private static final String QUEUE = "emailQueue";
     private static final String TOPIC = "emailExchange";
     private static final String serviceQueue = "serviceQueue";
-//    private static final String serviceExchange = "serviceExchange";
 
     @Bean
     public Queue queue()
@@ -23,12 +22,6 @@ public class RabbitMQConfiguration {
     {
         return new Queue(serviceQueue, true);
     }
-//
-//    @Bean
-//    public TopicExchange serviceExchange()
-//    {
-//        return new TopicExchange(serviceExchange);
-//    }
 
     @Bean
     public TopicExchange exchange()
