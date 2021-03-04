@@ -3,14 +3,15 @@ package neumont.donavon.tommy.LabOne.services;
 import neumont.donavon.tommy.LabOne.exceptions.ResourceNotFoundException;
 import neumont.donavon.tommy.LabOne.models.Role;
 import neumont.donavon.tommy.LabOne.repositories.RoleJPARepository;
+import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@CacheConfig(cacheNames = {"roles"})
 public class RoleServices {
 
     private final RoleJPARepository roleRepo;
@@ -30,14 +31,14 @@ public class RoleServices {
         return roleRepo.findAll();
     }
 
-    @Cacheable(value = "roles", key = "#id")
+    @Cacheable(key = "#id")
     public Role getRoleById(final long id)
     {
         System.out.println("Getting user with id " + id);
         return roleRepo.findById(id).orElseThrow(()-> new ResourceNotFoundException(id));
     }
 
-    @CachePut(value = "roles", key = "#id")
+    @CacheEvict( key = "#id", allEntries = true)
     public void deepUpdate(final long id, final Role copy)
     {
         Role r = roleRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
@@ -46,7 +47,7 @@ public class RoleServices {
         roleRepo.save(r);
     }
 
-    @CachePut(value = "roles", key = "#id")
+    @CacheEvict( key = "#id", allEntries = true)
     public void update(final long id, final Role copy)
     {
         Role r = roleRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
@@ -61,7 +62,7 @@ public class RoleServices {
         roleRepo.save(r);
     }
 
-    @CacheEvict(value = "roles", allEntries = true)
+    @CacheEvict(key = "#id", allEntries = true)
     public void deleteRole(final long id)
     {
         roleRepo.deleteById(id);
