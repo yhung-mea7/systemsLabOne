@@ -8,23 +8,32 @@ import neumont.donavon.tommy.LabOne.repositories.ServiceRequestJPARepository;
 import neumont.donavon.tommy.LabOne.repositories.UserJPARepository;
 import neumont.donavon.tommy.LabOne.resources.ServiceRequestResource;
 import org.apache.tomcat.util.codec.binary.Base64;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@CacheConfig(cacheNames = {"requests"})
 public class ServiceRequestServices {
 
     private final ServiceRequestJPARepository serviceRepo;
     private final UserJPARepository userRepo;
     private final RabbitTemplate amqpTemplate;
+
+
+    Logger logger = LoggerFactory.getLogger(ServiceRequestServices.class);
 
     ServiceRequestServices(ServiceRequestJPARepository serviceRepo, UserJPARepository userRepo, RabbitTemplate amqpTemplate)
     {
@@ -32,6 +41,8 @@ public class ServiceRequestServices {
         this.userRepo = userRepo;
         this.amqpTemplate = amqpTemplate;
     }
+
+
 
     public List<ServiceRequest> findAll()
     {
@@ -60,31 +71,32 @@ public class ServiceRequestServices {
                 .collect(Collectors.toList());
     }
 
-    @Cacheable(value = "servicerequest", key = "#id")
+    @Cacheable(key = "#id")
     public ServiceRequest getServiceById(final long id)
     {
+        logger.info("I've been hit");
         return serviceRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
     }
 
-    @Cacheable(value = "servicerequest", key = "#streetAddress")
+    @Cacheable(key = "#streetAddress")
     public List<ServiceRequest> searchByStreetAddress(final String streetAddress)
     {
         return serviceRepo.searchByStreetAddress(streetAddress);
     }
 
-    @Cacheable(value = "servicerequest", key = "#city")
+    @Cacheable(key = "#city")
     public List<ServiceRequest> searchByCity(final String city)
     {
         return serviceRepo.searchByCity(city);
     }
 
-    @Cacheable(value = "servicerequest", key = "#zip")
+    @Cacheable(key = "#zip")
     public List<ServiceRequest> searchByZip(final int zip)
     {
         return serviceRepo.searchByZipCode(zip);
     }
 
-    @CachePut(value = "servicerequest", key = "#id")
+    @CacheEvict(key = "#id", allEntries = true)
     public void updateAllFields(final long id, final ServiceRequest serviceRequest)
     {
         ServiceRequest og = serviceRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
@@ -99,7 +111,7 @@ public class ServiceRequestServices {
         serviceRepo.save(og);
     }
 
-    @CachePut(value = "servicerequest", key = "#id")
+    @CacheEvict(key = "#id", allEntries = true)
     public void update(final long id, final ServiceRequest updates)
     {
         ServiceRequest og = serviceRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
@@ -139,7 +151,7 @@ public class ServiceRequestServices {
         serviceRepo.save(og);
     }
 
-//    @CachePut(value = "servicerequest", key = "#id")
+    @CacheEvict(key = "#id", allEntries = true)
     public boolean claimRequest(final long id, final String serviceProviderID)
     {
         ServiceRequest request = serviceRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
@@ -157,7 +169,7 @@ public class ServiceRequestServices {
         return false;
     }
 
-//    @CachePut(value = "servicerequest", key = "#id")
+    @CacheEvict(key = "#id", allEntries = true)
     public boolean completeRequest(final long id, final String serviceProviderID)
     {
         ServiceRequest request = serviceRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
@@ -174,7 +186,7 @@ public class ServiceRequestServices {
         return false;
     }
 
-    @CacheEvict(value = "servicerequest", key = "#id")
+    @CacheEvict(key = "#id", allEntries = true)
     public void deleteById(final long id)
     {
         serviceRepo.deleteById(id);

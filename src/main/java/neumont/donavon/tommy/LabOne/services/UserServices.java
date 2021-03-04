@@ -20,10 +20,6 @@ public class UserServices {
     private final PasswordEncoder encoder;
     private final RabbitTemplate amqpTemplate;
 
-
-
-
-
      UserServices(UserJPARepository userRepo, RoleJPARepository roleRepo, PasswordEncoder encoder, RabbitTemplate amqpTemplate)
     {
         this.userRepo = userRepo;

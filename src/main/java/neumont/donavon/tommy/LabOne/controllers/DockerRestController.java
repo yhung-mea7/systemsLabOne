@@ -1,5 +1,6 @@
 package neumont.donavon.tommy.LabOne.controllers;
 
+import org.springframework.boot.actuate.metrics.MetricsEndpoint;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +19,7 @@ public class DockerRestController {
 
     private static int count = 0;
 
+
     @GetMapping
     public HttpEntity<Map<String, String>> roundRobin() throws UnknownHostException {
         String s = InetAddress.getLocalHost().getHostName();
@@ -28,4 +30,7 @@ public class DockerRestController {
         return new ResponseEntity<>(response, HttpStatus.OK);
 
     }
+
+
+
 }
